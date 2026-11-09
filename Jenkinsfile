@@ -12,19 +12,30 @@ pipeline {
             }
         }
 
+        
         stage('Setup') {
             steps {
                 sh '''
+                    echo "Checking Python version"
                     python3 --version
 
+                    echo "Removing previous virtual environment"
+                    rm -rf venv
+
+                    echo "Creating clean virtual environment"
                     python3 -m venv venv
 
-                    venv/bin/python -m pip install --upgrade pip
+                    echo "Initializing pip"
+                    venv/bin/python -m ensurepip --upgrade
 
-                    venv/bin/python -m pip install -r requirements.txt
+                    echo "Installing dependencies"
+                    venv/bin/python -m pip install --no-cache-dir -r requirements.txt
+
+                    echo "Setup completed successfully"
                 '''
             }
         }
+
 
         stage('Validation') {
             steps {
