@@ -47,18 +47,26 @@ pipeline {
             }
         }
 
+        
         stage('Testing') {
             steps {
                 sh '''
                     mkdir -p reports
 
-                    venv/bin/python -m pytest \
-                        tests/ \
+                    echo "Running tests with code coverage"
+
+                    venv/bin/python -m pytest tests/ \
+                        -v \
                         --junitxml=reports/test-results.xml \
-                        -v
+                        --cov=src \
+                        --cov-report=term-missing \
+                        --cov-report=xml:reports/coverage.xml \
+                        --cov-report=html:reports/coverage-html \
+                        --cov-fail-under=80
                 '''
             }
         }
+
     }
 
     post {
@@ -68,6 +76,11 @@ pipeline {
                     junit(
                         testResults: 'reports/*.xml',
                         allowEmptyResults: true
+                    )
+
+                    archiveArtifacts(
+                        artifacts: 'reports/**',
+                        allowEmptyArchive: true
                     )
                 }
             }
