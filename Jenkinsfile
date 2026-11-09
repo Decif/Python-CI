@@ -59,6 +59,7 @@ pipeline {
                         -v \
                         --junitxml=reports/test-results.xml \
                         --cov=src \
+                        --cov-branch \
                         --cov-report=term-missing \
                         --cov-report=xml:reports/coverage.xml \
                         --cov-report=html:reports/coverage-html \
