@@ -39,11 +39,12 @@ pipeline {
         stage('Testing') {
             steps {
                 sh '''
-                    venv/bin/python -m pytest -v \
-                        --junitxml=reports/junit.xml \
-                        --cov=src \
-                        --cov-report=term-missing \
-                        --cov-report=xml:reports/coverage.xml
+                    mkdir -p reports
+
+                    venv/bin/python -m pytest \
+                        tests/ \
+                        --junitxml=reports/test-results.xml \
+                        -v
                 '''
             }
         }
@@ -51,13 +52,20 @@ pipeline {
 
     post {
         always {
-            junit 'reports/junit.xml'
-            archiveArtifacts artifacts: 'reports/*.xml',
-                             allowEmptyArchive: true
+            script {
+                if (fileExists('reports')) {
+                    junit(
+                        testResults: 'reports/*.xml',
+                        allowEmptyResults: true
+                    )
+                }
+            }
+
+            echo 'CI Pipeline finished'
         }
 
         success {
-            echo 'CI Pipeline completed successfully!'
+            echo 'CI Pipeline SUCCESS!'
         }
 
         failure {
