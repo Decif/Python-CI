@@ -47,6 +47,20 @@ pipeline {
             }
         }
 
+        stage('Static Analysis') {
+            steps {
+                sh '''
+                    echo "Starting static code analysis"
+
+                    venv/bin/pylint src \
+                        --output-format=text \
+                        --reports=y \
+                        --score=y \
+                        --fail-under=8.0
+                '''
+            }
+        }
+
         
         stage('Testing') {
             steps {
